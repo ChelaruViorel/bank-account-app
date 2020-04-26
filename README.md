@@ -9,3 +9,6 @@ We concentrate our exercise only on the opening of the account. We make a clear 
 We can achieve this separation of requesting an account and the actual creation of the account by implementing 2 separated backend microservices called account-requester and account-solver. The account-requester will take the user's request and send it as a message on a Kafka topic, which will be processed to insert an account request record in a Postgresql database. And here the job of the account-requester is done. Then, the account-solver will pick an account request and will start to solved the request by doing whatever necessary to create a bank account, which in our case is just the creation of a record in the accounts table in the database because this is just aan example. Also, this separation of the account request creation and solving into 2 different microservices will allow us to scale them granularly.
 
 This activity is summarized in the following diagram. All the components of this architecture are deployed as docker containers so the diagram will show the interaction betweeken these docker containers.
+![Bank account app architecture](diagram/bank-account-app.png)
+
+The docker containers are implemented as follows:  
