@@ -2,3 +2,4 @@
 /account-solver/target/
 /account-ui/node_modules/
 /account-requester/deploy/account-requester-0.0.1-SNAPSHOT.jar
+/account-solver/deploy/account-solver-0.0.1-SNAPSHOT.jar
