@@ -177,3 +177,67 @@ f7c6aa845a2e        postgres:latest            "docker-entrypoint.s…"   3 seco
 2d8c3de0148e        wurstmeister/zookeeper     "/bin/sh -c '/usr/sb…"   3 seconds ago       Up 2 seconds            22/tcp, 2181/tcp, 2888/tcp, 3888/tcp   zookeeper
 ff8fde3c6aea        account-ui:latest          "nginx -g 'daemon of…"   3 seconds ago       Up 2 seconds            8080/tcp, 0.0.0.0:4200->80/tcp         account-ui
 ```
+
+How to undeploy the docker containers.
+```
+cd ~/bank-account-app/docker/deploy
+./undeploy.sh
+```
+
+# How to access and use the application
+Now that we deployed the application locally, we can try to access it.
+
+## Web
+Access the application in the browser at this url `http://localhost:4200`
+
+## Database
+Access the database using psql
+```
+psql -h localhost -U ing 
+```
+
+The password is `ing`, database name is `ing`, and here are the tables
+```
+select * from clients;
+select * from account_request;
+select * from account;
+select * from account_worker_heartbeat;
+```
+
+## Docker
+To access the container logs
+```
+sudo docker logs -f account-requester
+sudo docker logs -f account-solver
+```
+
+To get a terminal inside the docker container (I use jdk-alpine images that have only sh not bash)
+```
+sudo docker exec -ti account-requester sh
+sudo docker exec -ti account-solver sh
+```
+
+## Other usefull commands
+```
+sudo docker-compose -f ing.yml up -d
+sudo docker-compose -f ing.yml down
+sudo docker container prune
+
+#from host
+psql -h localhost -U ing
+
+#from container
+sudo docker exec -it  db bash
+> psql -U ing
+
+
+sudo docker exec -ti kafka bash
+kafka-topics.sh --zookeeper zookeeper:2181 --list
+kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic accounts
+kafka-console-producer.sh --broker-list localhost:9092 --topic accounts
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic accounts --group console-group
+
+#count messages in topic
+sudo docker exec -ti kafka bash
+kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list localhost:9092 --topic accounts
+```
