@@ -97,19 +97,52 @@ git version 2.7.4
 
 ---------------------------------------------------------------------------------------
 # HOW TO DOWNLOAD THE PROJECT FROM GIT
+
 cd ~
 git clone https://github.com/ChelaruViorel/bank-account-app.git
 cd ~/bank-account-app/account-ui
-npm install ??????????
+npm install
 
 # HOW TO BUILD APP
+
 cd ~/bank-account-app/docker/build
 ./build-all.sh
 
-# HOW TO DEPLOY APP
+# HOW TO DEPLOY APP and UNDEPLOY APP
+
 cd ~/bank-account-app/docker/deploy
-./deploy/sh
+./deploy.sh
 ./undeploy.sh
+
+#HOW TO ACCESS THE APP
+
+#FOR WEB 
+
+http://localhost:4200
+#the web form requires client CNP and initial deposit
+#for client CNP you can find 2 clients in the database table clients
+#initial deposit must be a numbers
+#the fields have angular validators, both fields must not be empty and initial deposit must be a number, otherwise the submit button will be disabled.
+
+# FOR POSTGRES DATABASE 
+
+psql -h localhost -U ing 
+# pwd=ing
+#select * from clients;
+#select * from account_request;
+#select * from account;
+#select * from account_worker_heartbeat;
+
+
+# FOR DOCKER
+
+# for logs
+sudo docker logs -f account-requester
+sudo docker logs -f account-solver
+
+#for getting a terminal inside the docker container
+sudo docker exec -ti account-requester sh
+sudo docker exec -ti account-solver sh
 
 ---------------------------------------------------------------------------------------
 # OTHER USEFUL COMMANDS
@@ -126,8 +159,8 @@ sudo docker exec -it  db bash
 
 
 sudo docker exec -ti kafka bash
-kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic accounts
 kafka-topics.sh --zookeeper zookeeper:2181 --list
+kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic accounts
 kafka-console-producer.sh --broker-list localhost:9092 --topic accounts
 kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic accounts --group console-group
 
