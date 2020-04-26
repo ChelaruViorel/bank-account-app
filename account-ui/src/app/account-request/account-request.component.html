@@ -1,0 +1,30 @@
+<form [formGroup]="accountRequestForm" (ngSubmit)=submitAccountRequest()>
+
+<div [className]="'container'">
+  <div [className]="'vertical-center'">
+    <label>
+        Client CNP:
+        <input type="text" formControlName="clientCnp">
+    </label>
+  </div>
+  
+  <div [className]="'vertical-center'">
+    <label>
+        Initial deposit:
+        <input type="text" formControlName="initialDeposit">
+    </label>
+  </div>
+
+  <div [className]="'vertical-center'">
+    <p>
+        <button type="submit" [disabled]="!accountRequestForm.valid">Request bank account</button>
+    </p>
+  </div>
+
+  <div *ngIf="accountService.messages.length">
+    <div *ngFor='let message of accountService.messages'> {{message}} </div>
+  </div>
+  
+</div>
+
+</form>
