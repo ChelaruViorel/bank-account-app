@@ -22,7 +22,10 @@ Account UI container runs the image built from the Angular application that I im
 
 # How to build & deploy the applications locally on your Ubuntu Linux computer
 
-Prerequisite tools: openjdk-14.0.1, node-v12.16.2-linux-x64, docker, docker-compose, psql, mvn, git
+## Prerequisite tools: 
+```
+openjdk-14.0.1, node-v12.16.2-linux-x64, docker, docker-compose, psql, mvn, git
+```
 
 We are going to install all the tools and this project in the Linux home directory, so set the working directory to ~
 ```
