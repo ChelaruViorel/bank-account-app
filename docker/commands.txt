@@ -100,6 +100,8 @@ git version 2.7.4
 
 cd ~
 git clone https://github.com/ChelaruViorel/bank-account-app.git
+
+
 cd ~/bank-account-app/account-ui
 npm install
 
@@ -157,14 +159,11 @@ psql -h localhost -U ing
 sudo docker exec -it  db bash
 > psql -U ing
 
-
 sudo docker exec -ti kafka bash
 kafka-topics.sh --zookeeper zookeeper:2181 --list
 kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic accounts
 kafka-console-producer.sh --broker-list localhost:9092 --topic accounts
 kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic accounts --group console-group
-
-
 
 http://localhost:9001/swagger-ui.html
 http://localhost:9001/v2/api-docs
