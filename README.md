@@ -20,4 +20,17 @@ Account Requester and Account Solver containers run the docker images built from
 Account UI container runs the image built from the Angular application that I implemented: account-ui.
 
 
-# How to build & deploy the applications locally on your computer
+# How to build & deploy the applications locally on your Ubuntu Linux computer
+
+Prerequisite tools: openjdk-14.0.1, node-v12.16.2-linux-x64, docker, docker-compose, psql, mvn, git
+
+We are going to install all the tools and this project in the Linux home directory, so set the working directory to ~
+```
+cd ~
+```
+
+Install java
+```
+wget https://download.java.net/java/GA/jdk14.0.1/664493ef4a6946b186ff29eb326336a2/7/GPL/openjdk-14.0.1_linux-x64_bin.tar.gz
+tar -xf openjdk-14.0.1_linux-x64_bin.tar.gz
+```
