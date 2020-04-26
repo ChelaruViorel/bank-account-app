@@ -1,6 +1,10 @@
 /account-requester/target/
+/account-requester/deploy/account-requester-0.0.1-SNAPSHOT.jar
+/account-requester/logs/
+
 /account-solver/target/
+/account-solver/deploy/account-solver-0.0.1-SNAPSHOT.jar
+/account-solver/logs/
+
 /account-ui/node_modules/
 /account-ui/dist/
-/account-requester/deploy/account-requester-0.0.1-SNAPSHOT.jar
-/account-solver/deploy/account-solver-0.0.1-SNAPSHOT.jar
