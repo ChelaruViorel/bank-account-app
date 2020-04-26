@@ -12,8 +12,11 @@ This activity is summarized in the following diagram. All the components of this
 ![Bank account app architecture](diagram/bank-account-app.png)
 
 The docker containers are implemented as follows:  
+
 Kafka, Zookeeper, Postgres containers run docker images found on https://hub.docker.com. Check the docker-compose file /docker/deploy/ing.yml to see exactly what image versions I used.
+
 Account Requester and Account Solver containers run the docker images built from the SpringBoot applications that I implemented: account-requester and account-solver.
+
 Account UI container runs the image built from the Angular application that I implemented: account-ui.
 
 
