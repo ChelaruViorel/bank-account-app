@@ -140,3 +140,40 @@ OS name: "linux", version: "4.4.0-166-generic", arch: "amd64", family: "unix"
 git --version
 git version 2.7.4
 ```
+
+## Download, Build & Deploy the bank-account-app project
+
+Download project
+```
+cd ~
+git clone https://github.com/ChelaruViorel/bank-account-app.git
+```
+
+Build npm modules for account-ui Angular app. This modules occupy a lot of space and they can be installed locally anytime so there is not point to put them in git because they will increase a lot the download time.
+```
+cd ~/bank-account-app/account-ui
+npm install
+```
+
+Build the project. You'll call the build all script that will build the code and the docker images for the account-requester, account-solver and account-ui projects.
+```
+cd ~/bank-account-app/docker/build
+./build-all.sh
+```
+
+How to deploy the docker containers locally.
+```
+cd ~/bank-account-app/docker/deploy
+./deploy.sh
+```
+
+After deploying, you can run `sudo docker ps` to see if they are running. The output of docker ps command should look like this:
+```
+CONTAINER ID        IMAGE                      COMMAND                  CREATED             STATUS                  PORTS                                  NAMES
+77ed7a2b167a        account-requester:latest   "java --enable-previ…"   1 second ago        Up Less than a second   0.0.0.0:9001->9001/tcp                 account-requester
+8791565ef196        account-solver:latest      "java --enable-previ…"   1 second ago        Up Less than a second   9001/tcp, 0.0.0.0:9002->9002/tcp       account-solver
+d88eb33550d8        wurstmeister/kafka         "start-kafka.sh"         2 seconds ago       Up 1 second             9092/tcp, 0.0.0.0:9093->9093/tcp       kafka
+f7c6aa845a2e        postgres:latest            "docker-entrypoint.s…"   3 seconds ago       Up 1 second             0.0.0.0:5432->5432/tcp                 db
+2d8c3de0148e        wurstmeister/zookeeper     "/bin/sh -c '/usr/sb…"   3 seconds ago       Up 2 seconds            22/tcp, 2181/tcp, 2888/tcp, 3888/tcp   zookeeper
+ff8fde3c6aea        account-ui:latest          "nginx -g 'daemon of…"   3 seconds ago       Up 2 seconds            8080/tcp, 0.0.0.0:4200->80/tcp         account-ui
+```
