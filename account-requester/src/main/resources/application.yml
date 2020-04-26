@@ -1,0 +1,27 @@
+server:
+  port : 9001
+
+spring:
+  application:
+    name: account-requester
+  datasource:
+    url: jdbc:postgresql://db:5432/ing
+    username: ing
+    password: ing
+    driver-class-name: org.postgresql.Driver
+  kafka:
+    bootstrap-servers: kafka:9092
+    topic:
+      account:
+        request: account-request
+        reply: account-reply
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      reply-group-id: ${spring.application.name}_${random.uuid}
+      group-id: ${spring.application.name}
+      auto-offset-reset: earliest
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
