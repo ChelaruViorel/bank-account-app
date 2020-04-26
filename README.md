@@ -188,7 +188,11 @@ cd ~/bank-account-app/docker/deploy
 Now that we deployed the application locally, we can try to access it.
 
 ## Web
-Access the application in the browser at this url `http://localhost:4200`
+Access the application in the browser at this url `http://localhost:4200` The web page requires a client CNP and an initial deposit number to submit the form.
+
+For existing client CNPs you can find 2 clients in the database by querying `select * from clients` . 
+
+The web form's fields have Angular validators, so both fields must not be empty, and initial deposit must be a number. Otherwise the submit button will be disabled.
 
 ## Database
 Access the database using psql
