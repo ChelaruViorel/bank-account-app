@@ -1,0 +1,11 @@
+server:
+  port : 9002
+
+spring:
+  application:
+    name: account-solver-${random.uuid}
+  datasource:
+    url: jdbc:postgresql://db:5432/ing
+    username: ing
+    password: ing
+    driver-class-name: org.postgresql.Driver
