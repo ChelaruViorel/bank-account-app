@@ -23,7 +23,7 @@ public class AccountSolverScheduler {
     @Autowired
     private AccountService accountService;
 
-    //@Scheduled(cron = "0 * 9-18 * * MON-FRI", zone = "Europe/Bucharest")
+    //@Scheduled(cron = "0 * 9-18 * * MON-FRI", zone = "Europe/Bucharest") //use this in production !!!!
     @Scheduled(cron = "*/10 * * * * *")
     public void processAccountRequests() {
         log.info("pick account request to process .... ");
