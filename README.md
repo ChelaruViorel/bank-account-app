@@ -34,3 +34,106 @@ Install java
 wget https://download.java.net/java/GA/jdk14.0.1/664493ef4a6946b186ff29eb326336a2/7/GPL/openjdk-14.0.1_linux-x64_bin.tar.gz
 tar -xf openjdk-14.0.1_linux-x64_bin.tar.gz
 ```
+
+Install node
+```
+wget https://nodejs.org/dist/v12.16.2/node-v12.16.2-linux-x64.tar.xz
+tar -xf node-v12.16.2-linux-x64.tar.xz
+```
+
+Open ~/.profile file
+```
+nano ~/.profile
+```
+
+At the end of the file copy these lines and then save the file
+```
+export JAVA_HOME=~/openjdk-14.0.1
+export PATH=~/node-v12.16.2-linux-x64/bin:~/openjdk-14.0.1/bin:$PATH
+```
+
+Because you updated the .profile file you normally should restart Ubuntu so that the env variables JAVA_HOME and PATH to be updated for every terminal that you open, but if you don't want to restart you have to remember that in every new terminal that you open first thing you want to do is to run this command `source ~/.profile`
+
+Install docker-compose
+```
+sudo curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+Let's install the rest of the tools using Ubuntu apt
+```
+sudo apt install docker
+sudo apt install psql
+sudo apt install mvn
+sudo apt install git
+```
+
+At the end of all these instalations the tools's version should look like this:
+```
+java -version
+openjdk version "14.0.1" 2020-04-14
+OpenJDK Runtime Environment (build 14.0.1+7)
+OpenJDK 64-Bit Server VM (build 14.0.1+7, mixed mode, sharing)
+
+npm version
+{
+  npm: '6.14.4',
+  ares: '1.15.0',
+  brotli: '1.0.7',
+  cldr: '36.0',
+  http_parser: '2.9.3',
+  icu: '65.1',
+  llhttp: '2.0.4',
+  modules: '72',
+  napi: '5',
+  nghttp2: '1.40.0',
+  node: '12.16.2',
+  openssl: '1.1.1e',
+  tz: '2019c',
+  unicode: '12.1',
+  uv: '1.34.2',
+  v8: '7.8.279.23-node.34',
+  zlib: '1.2.11'
+}
+
+sudo docker version
+Client:
+ Version:           18.09.7
+ API version:       1.39
+ Go version:        go1.10.4
+ Git commit:        2d0083d
+ Built:             Fri Aug 16 14:19:38 2019
+ OS/Arch:           linux/amd64
+ Experimental:      false
+
+Server:
+ Engine:
+  Version:          18.09.7
+  API version:      1.39 (minimum version 1.12)
+  Go version:       go1.10.4
+  Git commit:       2d0083d
+  Built:            Thu Aug 15 15:12:41 2019
+  OS/Arch:          linux/amd64
+  Experimental:     false
+
+
+sudo docker-compose version
+docker-compose version 1.25.5, build 8a1c60f6
+docker-py version: 4.1.0
+CPython version: 3.7.5
+OpenSSL version: OpenSSL 1.1.0l  10 Sep 2019
+
+psql --version
+psql (PostgreSQL) 9.5.21
+
+mvn --version
+Apache Maven 3.3.9
+Maven home: /usr/share/maven
+Java version: 14.0.1, vendor: Oracle Corporation
+Java home: /home/mimi/.jdks/openjdk-14.0.1
+Default locale: en_US, platform encoding: UTF-8
+OS name: "linux", version: "4.4.0-166-generic", arch: "amd64", family: "unix"
+
+git --version
+git version 2.7.4
+```
