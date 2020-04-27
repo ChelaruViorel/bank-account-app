@@ -195,7 +195,9 @@ For existing client CNPs you can find 2 clients in the database by querying `sel
 The web form's fields have Angular validators, so both fields must not be empty, and initial deposit must be a number. Otherwise the submit button will be disabled.
 
 The backend is available also through swagger. 
+
 account-requester swagger is available at `http://localhost:9001/swagger-ui.html`
+
 account-solver swagger is available at `http://localhost:9002/swagger-ui.html`
 
 
