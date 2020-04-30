@@ -9,3 +9,8 @@ spring:
     username: ing
     password: ing
     driver-class-name: org.postgresql.Driver
+
+scheduler:
+  account:
+    solver:
+      crontab: "*/10 * * * * *"

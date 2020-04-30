@@ -2,9 +2,11 @@ package vio.account.solver.dao;
 
 import vio.account.solver.model.AccountRequest;
 
+import java.util.Optional;
+
 public interface AccountRequestDao {
     void cleanupAccountRequestWithDeadWorkers();
-    Long pickProcessableAccountRequest(String workerName);
+    Optional<Long> pickProcessableAccountRequest(String workerName);
     void finishProcessingRequest(long requestId);
-    AccountRequest findAccountRequestById(long requestId);
+    Optional<AccountRequest> findAccountRequestById(long requestId);
 }

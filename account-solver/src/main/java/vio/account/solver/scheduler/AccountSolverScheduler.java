@@ -10,6 +10,8 @@ import vio.account.solver.dao.AccountRequestDao;
 import vio.account.solver.model.AccountRequest;
 import vio.account.solver.service.AccountService;
 
+import java.util.Optional;
+
 @Slf4j
 @Component
 public class AccountSolverScheduler {
@@ -23,13 +25,12 @@ public class AccountSolverScheduler {
     @Autowired
     private AccountService accountService;
 
-    //@Scheduled(cron = "0 * 9-18 * * MON-FRI", zone = "Europe/Bucharest") //use this in production !!!!
-    @Scheduled(cron = "*/10 * * * * *") //just for tests !!!
+    @Scheduled(cron = "${scheduler.account.solver.crontab}", zone = "Europe/Bucharest")
     public void processAccountRequests() {
         log.info("pick account request to process .... ");
 
-        Long pickedRequestId = accountRequestDao.pickProcessableAccountRequest(workerName);
-        if (pickedRequestId == null) {
+        Optional<Long> pickedRequestId = accountRequestDao.pickProcessableAccountRequest(workerName);
+        if (pickedRequestId.isEmpty()) {
             log.info("No processable requests available ! Nothing to do, exiting !");
             return;
         }
@@ -37,8 +38,12 @@ public class AccountSolverScheduler {
         //I picked an account request
         log.info("processing account request id=" + pickedRequestId + " ... ");
 
-        AccountRequest request = accountRequestDao.findAccountRequestById(pickedRequestId);
-        accountService.createAccount(request);
+        Optional<AccountRequest> request = accountRequestDao.findAccountRequestById(pickedRequestId.get());
+        if(request.isEmpty()) {
+            log.warn("Picked an account request that does not exist any more !!! request id="+pickedRequestId);
+            return;
+        }
+        accountService.createAccount(request.get());
 
         log.info("DONE processing account request id=" + pickedRequestId + " ! ");
     }

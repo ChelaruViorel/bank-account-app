@@ -9,6 +9,8 @@ import vio.account.requester.model.AccountRequestStatus;
 import vio.account.requester.model.AccountType;
 import vio.account.requester.service.AccountService;
 
+import java.util.Optional;
+
 import static vio.account.requester.model.AccountRequestStatus.*;
 
 @Slf4j
@@ -36,7 +38,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String getAccountRequestStatus(long requestId) {
+    public Optional<AccountRequestStatus> getAccountRequestStatus(long requestId) {
         return accountDao.findAccountRequestStatus(requestId);
     }
 }

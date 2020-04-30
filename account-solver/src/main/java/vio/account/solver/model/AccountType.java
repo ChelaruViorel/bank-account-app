@@ -1,28 +1,24 @@
 package vio.account.solver.model;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 public enum AccountType {
     CURRENT(1), SAVINGS(2);
 
-    private int id;
+    private Integer id;
 
     private AccountType(int id) {
         this.id = id;
     }
 
-    public static AccountType fromId(Integer id) {
-        if(id == null) {
-            return null;
-        }
-        for (AccountType type : AccountType.values()) {
-            if (type.getId() == id.intValue()) {
-                return type;
-            }
-        }
-
-        return null;
+    public static Optional<AccountType> fromId(Integer id) {
+        return Arrays.stream(AccountType.values())
+                .filter(accountType -> accountType.getId().equals(id))
+                .findFirst();
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 }

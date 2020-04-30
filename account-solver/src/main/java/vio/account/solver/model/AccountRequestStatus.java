@@ -1,27 +1,24 @@
 package vio.account.solver.model;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 public enum AccountRequestStatus {
     NEW(1), PROCESSING(2), PROCESSED(3), FAILED(4);
 
-    private int id;
+    private Integer id;
+
     private AccountRequestStatus(int id) {
         this.id = id;
     }
 
-    public static AccountRequestStatus fromId(Integer id) {
-        if(id == null) {
-            return null;
-        }
-        for (AccountRequestStatus status : AccountRequestStatus.values()) {
-            if (status.getId() == id.intValue()) {
-                return status;
-            }
-        }
-
-        return null;
+    public static Optional<AccountRequestStatus> fromId(Integer id) {
+        return Arrays.stream(AccountRequestStatus.values())
+                .filter(accountRequestStatus -> accountRequestStatus.getId().equals(id))
+                .findFirst();
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 }

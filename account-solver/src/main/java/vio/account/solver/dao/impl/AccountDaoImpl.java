@@ -23,7 +23,7 @@ public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 
     @Override
     public void createAccount(Account account) {
-        String sqlInsert = "insert into account (iban, account_type, client_cnp, current_amount) values (?,?,?,?)";
+        var sqlInsert = "insert into account (iban, account_type, client_cnp, current_amount) values (?,?,?,?)";
         getJdbcTemplate().update(sqlInsert, account.getIban(), account.getAccountType().getId(), account.getClientCnp(), account.getCurrentAmount());
     }
 }

@@ -1,6 +1,6 @@
 package vio.account.requester.model;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -13,18 +13,13 @@ public enum AccountType {
         this.id = id;
     }
 
-    public static AccountType fromName(String name) {
-        if (isEmpty(name)) {
-            return null;
-        }
-
+    public static Optional<AccountType> fromName(String name) {
         AccountType result = null;
         try {
             result = AccountType.valueOf(name.toUpperCase());
-        } catch (Exception e) {
+        } catch (Exception e) {}
 
-        }
-        return result;
+        return Optional.ofNullable(result);
     }
 
     public int getId() {

@@ -8,6 +8,7 @@ import vio.account.solver.model.AccountType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 
 public class AccountRequestRowMapper implements RowMapper<AccountRequest> {
@@ -16,14 +17,22 @@ public class AccountRequestRowMapper implements RowMapper<AccountRequest> {
         AccountRequest req = new AccountRequest();
         req.setId(rs.getLong("id"));
         req.setClientCnp(rs.getString("client_cnp"));
-        req.setAccountType(AccountType.fromId(rs.getObject("account_type", Integer.class)));
+
+        Optional<AccountType> accountTypeOpt = AccountType.fromId(rs.getObject("account_type", Integer.class));
+        if (!accountTypeOpt.isEmpty()) {
+            req.setAccountType(accountTypeOpt.get());
+        }
+
         req.setInitialDeposit(rs.getDouble("initial_deposit"));
         req.setAgentUsername(rs.getString("agent_username"));
 
         Timestamp requestTimestamp = rs.getTimestamp("request_timestamp");
         req.setRequestTimestamp(requestTimestamp == null ? null : requestTimestamp.toInstant());
 
-        req.setStatus(AccountRequestStatus.fromId(rs.getObject("status", Integer.class)));
+        Optional<AccountRequestStatus> statusOpt = AccountRequestStatus.fromId(rs.getObject("status", Integer.class));
+        if (statusOpt.isEmpty()) {
+            req.setStatus(statusOpt.get());
+        }
 
         Timestamp processingStartTime = rs.getTimestamp("processing_start_time");
         req.setProcessingStartTime(processingStartTime == null ? null : processingStartTime.toInstant());
