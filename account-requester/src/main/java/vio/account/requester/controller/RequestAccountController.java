@@ -1,12 +1,14 @@
 package vio.account.requester.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import vio.account.requester.controller.exceptions.AccountRequestNotFoundException;
 import vio.account.requester.controller.exceptions.AccountTypeNotExistsException;
@@ -14,24 +16,30 @@ import vio.account.requester.controller.exceptions.InvalidWebFieldException;
 import vio.account.requester.messaging.BaseMessage;
 import vio.account.requester.messaging.MessageRequestAccount;
 import vio.account.requester.messaging.MessageRequestAccountResponse;
-import vio.account.requester.model.AccountRequestStatus;
 import vio.account.requester.model.AccountType;
 import vio.account.requester.service.AccountService;
 import vio.account.requester.service.ClientService;
 
-import java.io.IOException;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
 
 import static java.time.Duration.ofMinutes;
 import static java.time.Instant.now;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static vio.account.requester.model.AccountType.SAVINGS;
 import static vio.account.requester.model.AccountType.fromName;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/account")
+@Validated
 public class RequestAccountController {
 
     @Value("${spring.kafka.topic.account.request}")
@@ -47,7 +55,8 @@ public class RequestAccountController {
     private ClientService clientService;
 
     @PostMapping(value = "/{accountType}/request", produces = "application/json", consumes = "application/json")
-    public RequestAccountResponse requestAccount(@PathVariable String accountType, @RequestBody RequestAccountData requestAccountData) throws IOException {
+    public CompletableFuture<RequestAccountResponse> requestAccount(@PathVariable @NotEmpty String accountType,
+                                                                    @Valid @RequestBody RequestAccountData requestAccountData) {
 
         validateRequestAccountParams(accountType, requestAccountData);
 
@@ -56,21 +65,17 @@ public class RequestAccountController {
 
         log.info("sending kafka request to topic: " + topicAccountRequests + " ..... ");
         ProducerRecord<String, BaseMessage> record = new ProducerRecord<>(topicAccountRequests, null, accountTypeVar.get().name(), msg);
-        RequestReplyFuture<String, BaseMessage, BaseMessage> future = replyingKafkaTemplate.sendAndReceive(record, ofMinutes(3));
-        try {
-            ConsumerRecord<String, BaseMessage> responseRecord = future.get();
+        RequestReplyFuture<String, BaseMessage, BaseMessage> sendMessageFuture = replyingKafkaTemplate.sendAndReceive(record, ofMinutes(3));
+
+        return sendMessageFuture.completable().thenCompose(responseRecord -> {
             MessageRequestAccountResponse responseMessage = (MessageRequestAccountResponse) responseRecord.value();
-
-            log.info("received reply message: " + responseMessage);
-            return new RequestAccountResponse(responseMessage.getStatus(), responseMessage.getMessage(), responseMessage.getAccountRequestId());
-
-        } catch (InterruptedException | ExecutionException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e);
-        }
+            log.debug("received reply message: " + responseMessage);
+            RequestAccountResponse response = new RequestAccountResponse(responseMessage.getStatus(), responseMessage.getMessage(), responseMessage.getAccountRequestId());
+            return CompletableFuture.completedFuture(response);
+        });
     }
 
-    private void validateRequestAccountParams(String accountType, RequestAccountData requestAccountData){
+    private void validateRequestAccountParams(String accountType, RequestAccountData requestAccountData) {
         if (fromName(accountType.toUpperCase()).isEmpty()) {
             throw new AccountTypeNotExistsException(accountType);
         }
@@ -84,7 +89,7 @@ public class RequestAccountController {
         }
     }
 
-    private MessageRequestAccount buildMessageRequestAccount(RequestAccountData requestAccountData){
+    private MessageRequestAccount buildMessageRequestAccount(RequestAccountData requestAccountData) {
         MessageRequestAccount msg = MessageRequestAccount.builder()
                 .initialDeposit(requestAccountData.getInitialDeposit())
                 .accountType(SAVINGS)
@@ -97,17 +102,32 @@ public class RequestAccountController {
     }
 
     @GetMapping("/{accountType}/request/{requestId}/status")
-    public RequestAccountStatusResponse getAccountRequestStatus(@PathVariable String accountType, @PathVariable Long requestId) throws IOException {
+    public CompletableFuture<RequestAccountStatusResponse> getAccountRequestStatus(@PathVariable @NotEmpty String accountType,
+                                                                                   @PathVariable @NotNull Long requestId) {
 
         if (fromName(accountType.toUpperCase()).isEmpty()) {
             throw new AccountTypeNotExistsException(accountType);
         }
 
-        Optional<AccountRequestStatus> status = accountService.getAccountRequestStatus(requestId);
-        if (status.isEmpty()) {
-            throw new AccountRequestNotFoundException(requestId);
-        }
+        return accountService.getAccountRequestStatus(requestId)
+                .thenCompose(status -> {
+                    if (status.isEmpty()) {
+                        throw new AccountRequestNotFoundException(requestId);
+                    }
+                    return completedFuture(new RequestAccountStatusResponse(status.get().name()));
+                });
+    }
 
-        return new RequestAccountStatusResponse(status.get().name());
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

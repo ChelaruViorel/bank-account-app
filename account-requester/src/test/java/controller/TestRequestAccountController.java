@@ -17,7 +17,10 @@ import vio.account.requester.service.ClientService;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static vio.account.requester.model.AccountRequestStatus.PROCESSED;
@@ -38,6 +41,14 @@ public class TestRequestAccountController {
     ClientService clientService;
 
     @Test
+    public void getAccountRequestStatus_emptyAccountType() throws IOException {
+        Exception e = assertThrows(AccountTypeNotExistsException.class, () -> {
+            controller.getAccountRequestStatus("", 1L);
+        });
+        assertNotNull(e);
+    }
+
+    @Test
     public void getAccountRequestStatus_invalidAccountType() throws IOException {
         Exception e = assertThrows(AccountTypeNotExistsException.class, () -> {
             controller.getAccountRequestStatus("BLA BLA", 1L);
@@ -47,18 +58,19 @@ public class TestRequestAccountController {
 
     @Test
     public void getAccountRequestStatus_invalidRequest() throws IOException {
-        when(accountService.getAccountRequestStatus(1L)).thenReturn(Optional.empty());
+        when(accountService.getAccountRequestStatus(1L)).thenReturn(completedFuture(Optional.empty()));
 
-        Exception e = assertThrows(AccountRequestNotFoundException.class, () -> {
-            controller.getAccountRequestStatus("SAVINGS", 1L);
+        Exception e = assertThrows(ExecutionException.class, () -> {
+            controller.getAccountRequestStatus("SAVINGS", 1L).get();
         });
         assertNotNull(e);
+        assertTrue(e.getMessage().contains("Could not find account request with id"));
     }
 
     @Test
-    public void getAccountRequestStatus_success() throws IOException {
-        when(accountService.getAccountRequestStatus(1L)).thenReturn(Optional.of(PROCESSED));
-        RequestAccountStatusResponse response = controller.getAccountRequestStatus("SAVINGS", 1L);
+    public void getAccountRequestStatus_success() throws IOException, ExecutionException, InterruptedException {
+        when(accountService.getAccountRequestStatus(1L)).thenReturn(completedFuture(Optional.of(PROCESSED)));
+        RequestAccountStatusResponse response = controller.getAccountRequestStatus("SAVINGS", 1L).get();
         assertNotNull(response);
         assertFalse(StringUtils.isEmpty(response.getStatus()));
         assertEquals("PROCESSED", response.getStatus());
