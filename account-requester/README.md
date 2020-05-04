@@ -116,7 +116,7 @@ public class AccountServiceImpl implements AccountService {
 }
 ```
 If we debug with a breakpoint in the AccountDaoImpl.findAccountRequestStatus() we get see in the following stack trace that AccountDaoImpl.findAccountRequestStatus() is executed in Tomcat's thread http-nio-9001-exec-5:
-![debug account-requester sync](docs/images/debug account-requester sync.png)
+![debug account-requester sync](docs/images/debug_account-requester_sync.png)
 
 
 Let's get back to the async implementation by uncommenting back the @Async in AccountServiceImpl
@@ -137,12 +137,12 @@ public class AccountServiceImpl implements AccountService {
 ```
 We will debug again but now with 2 breakpoints: 1 breakpoint in RequestAccountController.getAccountRequestStatus() and 1 breakpoint in AccountDaoImpl.findAccountRequestStatus().
 And we start the debugger again. And our first stop is in the RequestAccountController.getAccountRequestStatus() where we can see that the request is still served by a thread in the Tomcat's thread pool, named http-nio-9001-exec-1.
-![debug async account-requester Tomcat thread](docs/images/debug async account-requester Tomcat thread.png)
+![debug async account-requester Tomcat thread](docs/images/debug_async_account-requester_Tomcat_thread.png)
 
 And we resume the debugger's execution which takes us to the next stop, in AccountDaoImpl.findAccountRequestStatus(), where we can see that function AccountDaoImpl.findAccountRequestStatus() runs in our custom thread pool, specifically in the thread named SpringAsyncThread-1.
-![debug async account-requester SpringAsyncThread](docs/images/debug async account-requester SpringAsyncThread.png)
+![debug async account-requester SpringAsyncThread](docs/images/debug_async_account-requester_SpringAsyncThread.png)
 
 And also, we can see that the Tomcat thread that initially served our request has alredy finished his job, and it's parked because there are no other requests to serve.
-![debug async account-solver Tomcat thread parked](docs/images/debug async account-solver Tomcat thread parked.png)
+![debug async account-solver Tomcat thread parked](docs/images/debug_async_account-solver_Tomcat_thread_parked.png)
 
 So this concludes our proof that the asynchronous implementation is working correctly.
