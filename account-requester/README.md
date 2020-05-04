@@ -94,6 +94,25 @@ And now the method getAccountRequestStatus() in RequestAccountController.
     }
 ```
 
-Cool, so now, when a GET /{accountType}/request/{requestId}/status is made, a thread from the Tomcat's thread pool is allocated for processing our request, but all it does is to chain multiple CompletableFuture-s and return the last one, and then going back into the Tomcat's thread pool to be used for other requests. Meanwhile we wait for the chain of CompletableFuture-s to finish execution of the custom SpringAsyncThread-* thread pool.
+Cool, so now, when a GET /{accountType}/request/{requestId}/status is made, a thread from the Tomcat's thread pool is allocated for processing our request, but all it does is to chain multiple CompletableFuture-s and return the last one, and then going back into the Tomcat's thread pool to be used for other requests. Meanwhile we wait for the chain of CompletableFuture-s to finish execution in the custom SpringAsyncThread-* thread pool.
 
 ## The proof that the async implementation works
+We can prove the async implementation works by debugging and observing the stack trace.
+Let's see first, that in the synchronous implementation, the operations are all executed by a thread in Tomcat's thread pool.
+Just for this proof, I will comment @Async in AccountsService, which will make the implementation synchronous even if we are using CompletableFuture.
+```
+@Slf4j
+@Service
+public class AccountServiceImpl implements AccountService {
+
+    @Autowired
+    private AccountDao accountDao;
+
+    //@Async
+    @Override
+    public CompletableFuture<Optional<AccountRequestStatus>> getAccountRequestStatus(long requestId) {
+        return CompletableFuture.completedFuture(accountDao.findAccountRequestStatus(requestId));
+    }
+}
+```
+If we breakpoint in the AccountDaoImpl.findAccountRequestStatus() we get this stack trace:
