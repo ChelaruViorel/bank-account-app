@@ -142,7 +142,7 @@ And we start the debugger again. And our first stop is in the RequestAccountCont
 And we resume the debugger's execution which takes us to the next stop, in AccountDaoImpl.findAccountRequestStatus(), where we can see that function AccountDaoImpl.findAccountRequestStatus() runs in our custom thread pool, specifically in the thread named SpringAsyncThread-1.
 ![debug async account-requester SpringAsyncThread](docs/images/debug_async_account-requester_SpringAsyncThread.png)
 
-And also, we can see that the Tomcat thread that initially served our request has alredy finished his job, and it's parked because there are no other requests to serve.
+And also, we can see that the Tomcat thread that initially served our request has already finished his job, and it's parked because there are no other requests to serve.
 ![debug async account-solver Tomcat thread parked](docs/images/debug_async_account-solver_Tomcat_thread_parked.png)
 
 So this concludes our proof that the asynchronous implementation is working correctly.
