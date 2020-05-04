@@ -5,10 +5,12 @@ The account-requester SpringBoot app takes fast and safe the request to create a
 
 The controller RequestAccountController is implemented asynchronously. What does this mean ? For example if you look at the POST method to request an account, instead of returning a RequestAccountResponse object
 ```
-RequestAccountResponse requestAccount(@PathVariable String accountType, @RequestBody RequestAccountData requestAccountData) 
+RequestAccountResponse requestAccount(@PathVariable String accountType, 
+                                      @RequestBody RequestAccountData requestAccountData) 
 ```
 it returns CompletableFuture<RequestAccountResponse>
 ```
-CompletableFuture<RequestAccountResponse> requestAccount(@PathVariable String accountType, @RequestBody RequestAccountData requestAccountData) 
+CompletableFuture<RequestAccountResponse> requestAccount(@PathVariable String accountType, 
+                                                         @RequestBody RequestAccountData requestAccountData) 
 ```
 
